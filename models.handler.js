@@ -65,6 +65,12 @@ const parseQueryParams = exports.parseQueryParams = (p) => {
   return returnValue
 }
 
+/**
+ * Helper function for create
+ */
+const getIdsOrId = (objOrArr) =>
+  (typeof objOrArr == 'array') ? objOrArr.map(x => ({_id: x._id})) : {_id: objOrArr._id}
+
 exports.index = Model => (req, res) => {
   const result = parseQueryParams(req.query)
   if (typeof result === 'string') return res.status(400).json(result)
@@ -83,7 +89,7 @@ exports.index = Model => (req, res) => {
 // Use _.zipWith to zip the client object with the ids
 exports.create = Model => (req, res) =>
   Model.create(req.body)
-    .then(x => x.map(y => ({_id: y._id})))
+    .then(getIdsOrId)
     .then(respondWithResult(res, 201))
     .then(x => x._id)
     .then(events.emitCreated(Model.modelName, req))
