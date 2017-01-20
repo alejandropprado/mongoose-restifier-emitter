@@ -1,0 +1,24 @@
+{
+  "name": "mongoose-restifier-emitter",
+  "version": "1.0.0",
+  "description": "A library that helps you build a RESTful API and suscribe to events",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yu-Track/mongoose-restifier-emitter.git"
+  },
+  "keywords": [
+    "mongoose",
+    "restifier",
+    "emitter"
+  ],
+  "author": "Nicolas Schurmann Lindemann",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Yu-Track/mongoose-restifier-emitter/issues"
+  },
+  "homepage": "https://github.com/Yu-Track/mongoose-restifier-emitter#readme"
+}
