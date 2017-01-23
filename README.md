@@ -14,7 +14,7 @@ router.get('/', handler.index(Todos))
 router.get('/:id', handler.show(Todos))
 router.post('/', handler.create(Todos))
 router.put('/', handler.update(Todos))
-router.delete('/', handler.destroy(Product))
+router.delete('/', handler.destroy(Todos))
 ```
 
 After every action, an event will be dispatched:
