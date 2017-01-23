@@ -75,8 +75,7 @@ exports.index = Model => (req, res) => {
   const result = parseQueryParams(req.query)
   if (typeof result === 'string') return res.status(400).json(result)
 
-  return Model
-    .find(result.q)
+  return ((result.count) ? Model.count(result.count) : Model.find(result.q))
     .limit(result.limit || 0)
     .select(result.select || false)
     .populate(result.populate || '')
