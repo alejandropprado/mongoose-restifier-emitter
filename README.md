@@ -14,7 +14,7 @@ router.get('/', handler.index(Todos))
 router.get('/:id', handler.show(Todos))
 router.post('/', handler.create(Todos))
 router.put('/', handler.update(Todos))
-router.delete('/', handler.destroy(Todos))
+router.delete('/', handler.destroy(Product))
 ```
 
 After every action, an event will be dispatched:
@@ -73,3 +73,36 @@ const Todos = mongoose.model('Todo', todosSchema)
 ```
 
 The events dispatched will have the structure `Todo:action`
+
+## The index method
+The most important endpoint in a RESTful API is the index method. You can make queries to this endpoint:
+```javascript
+GET
+http://localhost:3000/?q={"desc":"foo"}
+```
+Will return the elements that match the attribute with `foo`
+```javascript
+GET
+http://localhost:3000/?select="desc -_id"
+```
+Will return the objects but only with the `desc` field and will omit the `_id` field
+
+```javascript
+GET
+http://localhost:3000/?limit=10
+```
+
+Will get only the first 10 elements
+
+You can also retrieve the total amount of certain documents:
+
+```javascript
+GET
+http://localhost:3000/?count={"desc":"lala"}
+```
+This will return an integer and not the actual documents.
+
+Of course you can compose this queries:
+```
+http://localhost:3000/?q={"desc":"lala"}&limit=10&select="desc -_id"
+```
