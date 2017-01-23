@@ -69,7 +69,7 @@ const parseQueryParams = exports.parseQueryParams = (p) => {
  * Helper function for create
  */
 const getIdsOrId = (objOrArr) =>
-  (typeof objOrArr == 'array') ? objOrArr.map(x => ({_id: x._id})) : {_id: objOrArr._id}
+  (Array.isArray(objOrArr)) ? objOrArr.map(x => ({_id: x._id})) : {_id: objOrArr._id}
 
 exports.index = Model => (req, res) => {
   const result = parseQueryParams(req.query)
@@ -91,7 +91,6 @@ exports.create = Model => (req, res) =>
   Model.create(req.body)
     .then(getIdsOrId)
     .then(respondWithResult(res, 201))
-    .then(x => x._id)
     .then(events.emitCreated(Model.modelName, req))
     .catch(handleError(res))
 

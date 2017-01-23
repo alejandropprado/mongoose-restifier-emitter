@@ -108,15 +108,22 @@ describe('Models request handlers', () => {
       res.send.returns(res)
     })
 
-    it('returns an array of {_id: ids}', () => {
-      // Cats
-      ModelStub.create.resolves([
+    it('Creating a collection returns an array of {_id: ids}', () => {
+      ModelStub.create.resolves(Array.from([
         { name: 'Zildjian', _id: '58824947d8977f43b2e94b37' },
         { name: 'Steve Jobs', _id: '58824947d8977f43b2e94b39' }
-      ])
+      ]))
       return handler.create(ModelStub)(req, res).then(x => {
         expect(res.json.args[0][0]).to.be.an("array")
         expect(res.json.args[0][0]).to.eql([{_id: '58824947d8977f43b2e94b37'}, {_id: '58824947d8977f43b2e94b39'}])
+      })
+    })
+
+    it('Creating an entity returns a single {_id: id}', () => {
+      ModelStub.create.resolves({ name: 'Zildjian', _id: '58824947d8977f43b2e94b37' })
+      return handler.create(ModelStub)(req, res).then(x => {
+        expect(res.json.args[0][0]).to.be.an("object")
+        expect(res.json.args[0][0]).to.eql({_id: '58824947d8977f43b2e94b37'});
       })
     })
 

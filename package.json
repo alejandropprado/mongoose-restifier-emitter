@@ -20,5 +20,11 @@
   "bugs": {
     "url": "https://github.com/Yu-Track/mongoose-restifier-emitter/issues"
   },
-  "homepage": "https://github.com/Yu-Track/mongoose-restifier-emitter#readme"
+  "homepage": "https://github.com/Yu-Track/mongoose-restifier-emitter#readme",
+  "dependencies": {
+    "chai": "^3.5.0",
+    "lodash": "^4.17.4",
+    "sinon": "^1.17.7",
+    "sinon-as-promised": "^4.0.2"
+  }
 }
