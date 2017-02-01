@@ -102,6 +102,12 @@ http://localhost:3000/?count={"desc":"lala"}
 ```
 This will return an integer and not the actual documents.
 
+You can also make aggregate queries:
+```
+GET
+http://localhost:3000/?aggregate={"$match":{"desc":"lala"},{"$sort":{"_id":-1}}}
+```
+
 Of course you can compose this queries:
 ```
 http://localhost:3000/?q={"desc":"lala"}&limit=10&select="desc -_id"

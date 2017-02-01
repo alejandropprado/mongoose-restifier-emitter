@@ -10,6 +10,7 @@ describe('#Models request handlers', () => {
     ModelStub = {
       find: sinon.stub(),
       count: sinon.stub(),
+      aggregate: sinon.stub(),
       findById: sinon.stub(),
       create: sinon.stub(),
       limit: sinon.stub(),
@@ -20,6 +21,7 @@ describe('#Models request handlers', () => {
 
     ModelStub.find.returns(ModelStub)
     ModelStub.count.returns(ModelStub)
+    ModelStub.aggregate.returns(ModelStub)
     ModelStub.findById.returns(ModelStub)
     ModelStub.limit.returns(ModelStub)
     ModelStub.select.returns(ModelStub)
@@ -100,6 +102,16 @@ describe('#Models request handlers', () => {
         expect(ModelStub.find.notCalled, 'Find should not be called').to.eql(true)
         expect(ModelStub.count.calledOnce, 'Count should be called').to.eql(true)
         expect(ModelStub.count.args[0][0]).to.eql({"foo": "bar"})
+      })
+    })
+
+    it('calls aggregate if exists in query', () => {
+      ModelStub.exec.resolves([{id: 2, name: 'ya'}])
+      return handler.index(ModelStub)({query: {aggregate: `{"foo": "bar"}`}}, res).then(x => {
+        expect(ModelStub.find.notCalled, 'Find should not be called').to.eql(true)
+        expect(ModelStub.count.notCalled, 'Count should not be called').to.eql(true)
+        expect(ModelStub.aggregate.calledOnce, 'aggregate should be called').to.eql(true)
+        expect(ModelStub.aggregate.args[0][0]).to.eql({"foo": "bar"})
       })
     })
   })
