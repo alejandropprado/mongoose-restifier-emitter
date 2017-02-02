@@ -4,7 +4,8 @@
   "description": "A library that helps you build a RESTful API and suscribe to events",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "tdd": "mocha --reporter spec --watch",
+    "test": "./node_modules/.bin/istanbul cover --report html _mocha -- -R spec",
     "coverage": "./node_modules/.bin/istanbul cover --report html _mocha -- -R spec *.spec.js"
   },
   "repository": {
