@@ -5,17 +5,12 @@ const events = require('./events')
  * Helper functions to handle response
  */
 const respondWithResult = (res, statusCode) => entity => {
-  statusCode = statusCode || 200
-  if (entity) {
-    res.status(statusCode).json(entity)
-    return entity
-  }
+  res.status(statusCode).json(entity)
 
-  return null
+  return entity
 }
 
 const respondWithoutResult = (res, statusCode) => () => {
-  statusCode = statusCode || 204
   res.status(statusCode).end()
 
   return

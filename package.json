@@ -4,7 +4,8 @@
   "description": "A library that helps you build a RESTful API and suscribe to events",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "coverage": "./node_modules/.bin/istanbul cover --report html _mocha -- -R spec *.spec.js"
   },
   "repository": {
     "type": "git",
@@ -26,5 +27,8 @@
     "lodash": "^4.17.4",
     "sinon": "^1.17.7",
     "sinon-as-promised": "^4.0.2"
+  },
+  "devDependencies": {
+    "istanbul": "^0.4.5"
   }
 }

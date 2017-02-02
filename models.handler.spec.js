@@ -47,6 +47,7 @@ describe('#Models request handlers', () => {
           select: `"desc -_id"`,
         }
       }
+      req.__proto__.test = 'test'
       res = {
         json: sinon.spy(),
         send: sinon.spy(),
@@ -228,6 +229,14 @@ describe('#Models request handlers', () => {
       return handler.update(ModelStub)(req, res).then(x => {
         expect(res.status.args[0][0]).to.eql(500)
         expect(res.send.args[0][0]).to.eql(new Error('some error'))
+      })
+    })
+
+    it('removes _id', () => {
+      ModelStub.exec.resolves(null)
+      const req2 = Object.assign({}, req, {body: {_id: 'someid'}})
+      return handler.update(ModelStub)(req2, res).then(x => {
+        expect(req2.body._id).to.eql(undefined);
       })
     })
   })
