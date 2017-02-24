@@ -42,42 +42,21 @@ const handleError = (res, statusCode) => err => {
 }
 
 /**
- * Parse the query params safely
- */
-const parseQueryParams = exports.parseQueryParams = (p) => {
-  let returnValue
-  try {
-    returnValue = {}
-    for (var key in p) {
-      if (p.hasOwnProperty(key)) {
-        returnValue[key] = JSON.parse(p[key]);
-      }
-    }
-  }catch(e) {
-    return 'invalid query params'
-  }
-
-  return returnValue
-}
-
-/**
  * Helper function for create
  */
 const getIdsOrId = (objOrArr) =>
   (Array.isArray(objOrArr)) ? objOrArr.map(x => ({_id: x._id})) : {_id: objOrArr._id}
 
-exports.index = Model => (req, res) => {
-  const result = parseQueryParams(req.query)
-  if (typeof result === 'string') return res.status(400).json(result)
+exports.index = Model => (req, res, next) => {
 
-  return ((result.count)
-    ? Model.count(result.count)
-    : (result.aggregate)
-      ? Model.aggregate(result.aggregate)
-      : Model.find(result.q))
-    .limit(result.limit || 0)
-    .select(result.select || false)
-    .populate(result.populate || '')
+  return ((req.query.count)
+    ? Model.count(req.query.count)
+    : (req.query.aggregate)
+      ? Model.aggregate(req.query.aggregate)
+      : Model.find(req.query.q))
+    .limit(req.query.limit || 0)
+    .select(req.query.select || false)
+    .populate(req.query.populate || '')
     .exec()
     .then(respondWithResult(res, 200))
     .then(events.emitListed(Model.modelName, req))

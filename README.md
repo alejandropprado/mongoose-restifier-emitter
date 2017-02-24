@@ -1,5 +1,21 @@
 # Mongoose Restifier Emitter
-It helps you building restful APIs and it emit events 
+It helps you building restful APIs and it emit events
+
+first, register the parser in express
+```javascript
+import { parser } from 'mongoose-restifier-emitter'
+
+...
+/*
+ * this will parse all query params into objects, it uses
+ * a forin and JSON.parse and will replace req.query
+ */ 
+app.use(parser) 
+...
+
+```
+
+then, in your routes
 ```javascript
 const mongoose = require('mongoose')
 const { handler } = require('mongoose-restifier-emitter')

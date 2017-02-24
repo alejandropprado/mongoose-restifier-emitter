@@ -3,7 +3,7 @@ const expect = require('chai').expect
 const assert = require('assert')
 const handler = require('./models.handler')
 require('sinon-as-promised')
-
+let req = {}, res = {}, next
 describe('#Models request handlers', () => {
   let ModelStub
   beforeEach(() => {
@@ -27,24 +27,15 @@ describe('#Models request handlers', () => {
     ModelStub.select.returns(ModelStub)
     ModelStub.populate.returns(ModelStub)
   })
-  describe('parseQueryParams', () => {
-    it('parse correctly', () => {
-      const parsed = handler.parseQueryParams({something: `{"x": "y"}`})
-      expect(parsed.something).to.have.property("x", "y")
-    })
-    it('catches errors', () => {
-      const parsed = handler.parseQueryParams({something: `{"x": "y}`})
-      expect(parsed).to.be.a("string").and.to.equal("invalid query params")
-    })
-  })
+
   describe('index', () => {
     let req, res
     beforeEach(() => {
       req = {
         query: {
-          q: `{"foo": "bar"}`,
+          q: {"foo": "bar"},
           limit: 10,
-          select: `"desc -_id"`,
+          select: "desc -_id",
         }
       }
       req.__proto__.test = 'test'
@@ -88,18 +79,10 @@ describe('#Models request handlers', () => {
       })
     })
 
-    it('handle invalid query q params', () => {
-      handler.index(ModelStub)({
-        query: {
-          q:"{'invalid: json"
-        }
-      }, res)
-      assert(res.status.calledWith(400), 'status is not invalid request')
-    })
 
     it('makes a count if exists in query', () => {
       ModelStub.exec.resolves([{id: 2, name: 'ya'}])
-      return handler.index(ModelStub)({query: {count: `{"foo": "bar"}`}}, res).then(x => {
+      return handler.index(ModelStub)({query: {count: {"foo": "bar"}}}, res).then(x => {
         expect(ModelStub.find.notCalled, 'Find should not be called').to.eql(true)
         expect(ModelStub.count.calledOnce, 'Count should be called').to.eql(true)
         expect(ModelStub.count.args[0][0]).to.eql({"foo": "bar"})
@@ -108,7 +91,7 @@ describe('#Models request handlers', () => {
 
     it('calls aggregate if exists in query', () => {
       ModelStub.exec.resolves([{id: 2, name: 'ya'}])
-      return handler.index(ModelStub)({query: {aggregate: `{"foo": "bar"}`}}, res).then(x => {
+      return handler.index(ModelStub)({query: {aggregate: {"foo": "bar"}}}, res).then(x => {
         expect(ModelStub.find.notCalled, 'Find should not be called').to.eql(true)
         expect(ModelStub.count.notCalled, 'Count should not be called').to.eql(true)
         expect(ModelStub.aggregate.calledOnce, 'aggregate should be called').to.eql(true)
