@@ -19,7 +19,7 @@ const respondWithoutResult = (res, statusCode) => () => {
 const saveUpdates = updates => entity => {
   const updated = _.merge(entity, updates)
   return updated.save()
-    .then((updated) => updated)
+    // .then(updated => updated)
 }
 
 const removeEntity = res => entity => entity
@@ -47,9 +47,8 @@ const handleError = (res, statusCode) => err => {
 const getIdsOrId = (objOrArr) =>
   (Array.isArray(objOrArr)) ? objOrArr.map(x => ({_id: x._id})) : {_id: objOrArr._id}
 
-exports.index = Model => (req, res, next) => {
-
-  return ((req.query.count)
+exports.index = Model => (req, res, next) =>
+  ((req.query.count)
     ? Model.count(req.query.count)
     : (req.query.aggregate)
       ? Model.aggregate(req.query.aggregate)
@@ -61,7 +60,6 @@ exports.index = Model => (req, res, next) => {
     .then(respondWithResult(res, 200))
     .then(events.emitListed(Model.modelName, req))
     .catch(handleError(res, 500))
-}
 
 // Use _.zipWith to zip the client object with the ids
 exports.create = Model => (req, res) =>

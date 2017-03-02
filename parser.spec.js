@@ -17,8 +17,7 @@ describe('#Query parser', () => {
       req.query = {something: `{"x": "y"}`}
       parseQueryParams(req, res, next)
       expect(req.query.something).to.have.property("x", "y")
-      expect(next.notCalled).to.be.true
-
+      expect(next.calledOnce).to.be.true
     })
 
     it('catches errors', () => {
