@@ -76,7 +76,7 @@ exports.update = Model => (req, res) => {
   if (req.body._id) {
     delete req.body._id
   }
-  return Model.findByIdAndUpdate(req.params.id).exec()
+  return Model.findByIdAndUpdate(req.params.id, req.body, { new: true }).exec()
     .then(handleEntityNotFound(res))
 
     .then(respondWithoutResult(res, 204))
