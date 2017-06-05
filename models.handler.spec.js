@@ -9,6 +9,7 @@ describe('#Models request handlers', () => {
   beforeEach(() => {
     ModelStub = {
       find: sinon.stub(),
+      findByIdAndUpdate: sinon.stub(),
       count: sinon.stub(),
       aggregate: sinon.stub(),
       findById: sinon.stub(),
@@ -20,6 +21,7 @@ describe('#Models request handlers', () => {
     }
 
     ModelStub.find.returns(ModelStub)
+    ModelStub.findByIdAndUpdate.returns(ModelStub)
     ModelStub.count.returns(ModelStub)
     ModelStub.aggregate.returns(ModelStub)
     ModelStub.findById.returns(ModelStub)
@@ -188,7 +190,7 @@ describe('#Models request handlers', () => {
     })
 
     it('updates an entity', () => {
-      let entityStub = {extra: 'extra field', save: sinon.stub()}
+      let entityStub = { extra: 'extra field', save: sinon.stub() }
       entityStub.save.resolves(Object.assign(entityStub, {desc: 'update description'}))
       ModelStub.exec.resolves(entityStub)
       return handler.update(ModelStub)(req, res).then(x => {
@@ -203,7 +205,7 @@ describe('#Models request handlers', () => {
       return handler.update(ModelStub)(req, res).then(x => {
         expect(res.status.args[0][0]).to.eql(404)
         expect(res.json.notCalled).to.eql(true)
-        expect(res.end.calledOnce).to.eql(true)
+        expect(res.end.called).to.eql(true)
       })
     })
 

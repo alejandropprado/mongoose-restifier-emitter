@@ -16,12 +16,6 @@ const respondWithoutResult = (res, statusCode) => () => {
   return
 }
 
-const saveUpdates = updates => entity => {
-  const updated = _.merge(entity, updates)
-  return updated.save()
-    // .then(updated => updated)
-}
-
 const removeEntity = res => entity => entity
     ? entity
       .remove()
@@ -82,9 +76,9 @@ exports.update = Model => (req, res) => {
   if (req.body._id) {
     delete req.body._id
   }
-  return Model.findById(req.params.id).exec()
+  return Model.findByIdAndUpdate(req.params.id).exec()
     .then(handleEntityNotFound(res))
-    .then(saveUpdates(req.body))
+
     .then(respondWithoutResult(res, 204))
     .then(events.emitUpdated(Model.modelName, req))
     .catch(handleError(res))
