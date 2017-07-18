@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "tdd": "mocha --reporter spec --watch",
-    "test": "./node_modules/.bin/istanbul cover --report html _mocha -- -R spec",
+    "test": "./node_modules/.bin/istanbul cover --report html _mocha -- -R spec *.spec.js",
     "coverage": "./node_modules/.bin/istanbul cover --report html _mocha -- -R spec *.spec.js"
   },
   "repository": {

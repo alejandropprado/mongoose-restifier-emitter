@@ -20,13 +20,13 @@ describe('#Query parser', () => {
       expect(next.calledOnce).to.be.true
     })
 
-    it('catches errors', () => {
+    it('does not parse if it cannot', () => {
       req.query = {something: `{"x": "y}`}
       parseQueryParams(req, res, next)
-      expect(next.calledWith("invalid query params")).to.be.true
+      expect(next.calledWith()).to.be.true
     })
 
   })
 
-  
+
 })

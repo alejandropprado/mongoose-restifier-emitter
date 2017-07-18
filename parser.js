@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
       if (p.hasOwnProperty(key)) parsed[key] = JSON.parse(p[key])
     }
   }catch(e) {
-    next('invalid query params')
+    next()
   }
   req.query = parsed
   next()
