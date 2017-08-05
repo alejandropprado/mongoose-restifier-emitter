@@ -20,7 +20,7 @@ then, in your routes
 const mongoose = require('mongoose')
 const { handler } = require('mongoose-restifier-emitter')
 
-var todosSchema = mongoose.Schema({
+const todosSchema = mongoose.Schema({
     desc: String,
 })
 
@@ -29,8 +29,9 @@ const Todos = mongoose.model('Todo', todosSchema)
 router.get('/', handler.index(Todos))
 router.get('/:id', handler.show(Todos))
 router.post('/', handler.create(Todos))
-router.put('/', handler.update(Todos))
-router.delete('/', handler.destroy(Product))
+router.put('/:id', handler.update(Todos))
+router.delete('/:id', handler.destroy(Todos))
+router.delete('/', handler.destroyBatch(Todos))
 ```
 
 After every action, an event will be dispatched:
@@ -81,7 +82,7 @@ The events format is based on the model name, so, if you have a model with this 
 ```javascript
 const mongoose = require('mongoose')
 
-var todosSchema = mongoose.Schema({
+const todosSchema = mongoose.Schema({
     desc: String,
 })
 // Model name here, first argument of model method
@@ -119,12 +120,12 @@ http://localhost:3000/?count={"desc":"lala"}
 This will return an integer and not the actual documents.
 
 You can also make aggregate queries:
-```
+```javascript
 GET
 http://localhost:3000/?aggregate={"$match":{"desc":"lala"},{"$sort":{"_id":-1}}}
 ```
 
 Of course you can compose this queries:
-```
+```javascript
 http://localhost:3000/?q={"desc":"lala"}&limit=10&select="desc -_id"
 ```

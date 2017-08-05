@@ -4,8 +4,10 @@ const assert = require('assert')
 const handler = require('./models.handler')
 require('sinon-as-promised')
 let req = {}, res = {}, next
+
 describe('#Models request handlers', () => {
   let ModelStub
+
   beforeEach(() => {
     ModelStub = {
       find: sinon.stub(),
@@ -17,7 +19,8 @@ describe('#Models request handlers', () => {
       limit: sinon.stub(),
       select: sinon.stub(),
       populate: sinon.stub(),
-      exec: sinon.stub()
+      exec: sinon.stub(),
+      deleteMany: sinon.stub(),
     }
 
     ModelStub.find.returns(ModelStub)
@@ -28,14 +31,16 @@ describe('#Models request handlers', () => {
     ModelStub.limit.returns(ModelStub)
     ModelStub.select.returns(ModelStub)
     ModelStub.populate.returns(ModelStub)
+    ModelStub.deleteMany.returns(ModelStub)
   })
 
   describe('index', () => {
     let req, res
+
     beforeEach(() => {
       req = {
         query: {
-          q: {"foo": "bar"},
+          q: { "foo": "bar" },
           limit: 10,
           select: "desc -_id",
         }
@@ -48,11 +53,12 @@ describe('#Models request handlers', () => {
       }
       res.status.returns(res)
     })
+
     it('respond with result', () => {
-      ModelStub.exec.resolves([{id: 1, name: 'ya'}])
+      ModelStub.exec.resolves([{ id: 1, name: 'ya' }])
 
       return handler.index(ModelStub)(req, res).then(x => {
-        assert(res.json.calledWith([{id: 1, name: 'ya'}]), 'Response.send not called with correct args')
+        assert(res.json.calledWith([{ id: 1, name: 'ya' }]), 'Response.send not called with correct args')
         assert(ModelStub.limit.calledWith(10), 'limit not called with 10')
         assert(ModelStub.select.calledWith('desc -_id'), 'limit not called with 10')
         assert(ModelStub.exec.calledOnce, 'Query not executed')
@@ -61,10 +67,10 @@ describe('#Models request handlers', () => {
     })
 
     it('even with a missing prop', () => {
-      ModelStub.exec.resolves([{id: 2, name: 'ya'}])
+      ModelStub.exec.resolves([{ id: 2, name: 'ya' }])
 
-      return handler.index(ModelStub)({query: {q: `{"foo": "bar"}`}}, res).then(x => {
-        assert(res.json.calledWith([{id: 2, name: 'ya'}]), 'Response.send not called with correct args')
+      return handler.index(ModelStub)({ query: { q: `{"foo": "bar"}` } }, res).then(x => {
+        assert(res.json.calledWith([{ id: 2, name: 'ya' }]), 'Response.send not called with correct args')
         assert(ModelStub.limit.calledWith(0), 'limit not called with 0')
         assert(ModelStub.select.calledWith(false), 'limit not called with 1')
         assert(ModelStub.exec.calledOnce, 'Query not executed')
@@ -83,30 +89,33 @@ describe('#Models request handlers', () => {
 
 
     it('makes a count if exists in query', () => {
-      ModelStub.exec.resolves([{id: 2, name: 'ya'}])
-      return handler.index(ModelStub)({query: {count: {"foo": "bar"}}}, res).then(x => {
+      ModelStub.exec.resolves([{ id: 2, name: 'ya' }])
+
+      return handler.index(ModelStub)({ query: { count: { "foo": "bar" } } }, res).then(x => {
         expect(ModelStub.find.notCalled, 'Find should not be called').to.eql(true)
         expect(ModelStub.count.calledOnce, 'Count should be called').to.eql(true)
-        expect(ModelStub.count.args[0][0]).to.eql({"foo": "bar"})
+        expect(ModelStub.count.args[0][0]).to.eql({ "foo": "bar" })
       })
     })
 
     it('calls aggregate if exists in query', () => {
-      ModelStub.exec.resolves([{id: 2, name: 'ya'}])
-      return handler.index(ModelStub)({query: {aggregate: {"foo": "bar"}}}, res).then(x => {
+      ModelStub.exec.resolves([{ id: 2, name: 'ya' }])
+
+      return handler.index(ModelStub)({ query: { aggregate: { "foo": "bar" } } }, res).then(x => {
         expect(ModelStub.find.notCalled, 'Find should not be called').to.eql(true)
         expect(ModelStub.count.notCalled, 'Count should not be called').to.eql(true)
         expect(ModelStub.aggregate.calledOnce, 'aggregate should be called').to.eql(true)
-        expect(ModelStub.aggregate.args[0][0]).to.eql({"foo": "bar"})
+        expect(ModelStub.aggregate.args[0][0]).to.eql({ "foo": "bar" })
       })
     })
   })
 
   describe('create', () => {
     let req, res
+
     beforeEach(() => {
       req = {
-        body: {}
+        body: {},
       }
       res = {
         json: sinon.spy(),
@@ -122,22 +131,25 @@ describe('#Models request handlers', () => {
         { name: 'Zildjian', _id: '58824947d8977f43b2e94b37' },
         { name: 'Steve Jobs', _id: '58824947d8977f43b2e94b39' }
       ]))
+
       return handler.create(ModelStub)(req, res).then(x => {
         expect(res.json.args[0][0]).to.be.an("array")
-        expect(res.json.args[0][0]).to.eql([{_id: '58824947d8977f43b2e94b37'}, {_id: '58824947d8977f43b2e94b39'}])
+        expect(res.json.args[0][0]).to.eql([{ _id: '58824947d8977f43b2e94b37' }, { _id: '58824947d8977f43b2e94b39' }])
       })
     })
 
     it('Creating an entity returns a single {_id: id}', () => {
       ModelStub.create.resolves({ name: 'Zildjian', _id: '58824947d8977f43b2e94b37' })
+
       return handler.create(ModelStub)(req, res).then(x => {
         expect(res.json.args[0][0]).to.be.an("object")
-        expect(res.json.args[0][0]).to.eql({_id: '58824947d8977f43b2e94b37'});
+        expect(res.json.args[0][0]).to.eql({ _id: '58824947d8977f43b2e94b37' })
       })
     })
 
     it('handles errors', () => {
       ModelStub.create.rejects('some error')
+
       return handler.create(ModelStub)(req, res).then(x => {
         expect(res.send.args[0][0]).to.eql(new Error('some error'))
       })
@@ -146,8 +158,9 @@ describe('#Models request handlers', () => {
 
   describe('show', () => {
     let req, res
+
     beforeEach(() => {
-      req = {params: {id: 'something'}}
+      req = { params: { id: 'something' } }
       res = {
         json: sinon.spy(),
         status: sinon.stub(),
@@ -158,14 +171,16 @@ describe('#Models request handlers', () => {
     })
 
     it('sends an element', () => {
-      ModelStub.exec.resolves({id: 'something'})
+      ModelStub.exec.resolves({ id: 'something' })
+
       return handler.show(ModelStub)(req, res).then(x => {
-        expect(res.json.args[0][0]).to.eql({id: 'something'})
+        expect(res.json.args[0][0]).to.eql({ id: 'something' })
       })
     })
 
     it('handles errors', () => {
       ModelStub.exec.rejects('some error')
+
       return handler.show(ModelStub)(req, res).then(x => {
         expect(res.send.args[0][0]).to.eql(new Error('some error'))
       })
@@ -176,8 +191,8 @@ describe('#Models request handlers', () => {
   describe('update', () => {
     beforeEach(() => {
       req = {
-        params: {id: 'something'},
-        body: {desc: 'update description'},
+        params: { id: 'something' },
+        body: { desc: 'update description' },
       }
       res = {
         json: sinon.spy(),
@@ -191,8 +206,9 @@ describe('#Models request handlers', () => {
 
     it('updates an entity', () => {
       let entityStub = { extra: 'extra field', save: sinon.stub() }
-      entityStub.save.resolves(Object.assign(entityStub, {desc: 'update description'}))
+      entityStub.save.resolves(Object.assign(entityStub, { desc: 'update description' }))
       ModelStub.exec.resolves(entityStub)
+
       return handler.update(ModelStub)(req, res).then(x => {
         expect(res.status.args[0][0]).to.eql(204)
         expect(res.json.notCalled).to.eql(true)
@@ -202,6 +218,7 @@ describe('#Models request handlers', () => {
 
     it('handles entity not found', () => {
       ModelStub.exec.resolves(null)
+
       return handler.update(ModelStub)(req, res).then(x => {
         expect(res.status.args[0][0]).to.eql(404)
         expect(res.json.notCalled).to.eql(true)
@@ -219,19 +236,21 @@ describe('#Models request handlers', () => {
 
     it('removes _id', () => {
       ModelStub.exec.resolves(null)
-      const req2 = Object.assign({}, req, {body: {_id: 'someid'}})
+      const req2 = Object.assign({}, req, { body: { _id: 'someid' } })
+
       return handler.update(ModelStub)(req2, res).then(x => {
-        expect(req2.body._id).to.eql(undefined);
+        expect(req2.body._id).to.eql(undefined)
       })
     })
   })
 
   describe('delete', () => {
     let entityStub
+
     beforeEach(() => {
       req = {
-        params: {id: 'something'},
-        body: {desc: 'update description'},
+        params: { id: 'something' },
+        body: { desc: 'update description' },
       }
       res = {
         json: sinon.spy(),
@@ -241,34 +260,51 @@ describe('#Models request handlers', () => {
       }
       res.status.returns(res)
       res.send.returns(res)
-      entityStub = {extra: 'extra field', remove: sinon.stub()}
+      entityStub = { extra: 'extra field', remove: sinon.stub() }
     })
 
     it('deletes an entity', () => {
       entityStub.remove.resolves(null)
       ModelStub.exec.resolves(entityStub)
+
       return handler.destroy(ModelStub)(req, res).then(x => {
         expect(res.status.args[0][0]).to.eql(204)
         expect(res.json.notCalled).to.eql(true)
         expect(res.end.calledOnce).to.eql(true)
       })
     })
+
+    it('deletes entities', () => {
+      entityStub.remove.resolves(null)
+      ModelStub.exec.resolves(entityStub)
+
+      return handler.destroyBatch(ModelStub)(req, res)
+        .then(x => {
+          expect(res.status.args[0][0]).to.eql(204)
+          expect(res.json.notCalled).to.eql(true)
+          expect(res.end.calledOnce).to.eql(true)
+        })
+    })
+
     it('handles entity not found', () => {
       entityStub.remove.resolves(null)
       ModelStub.exec.resolves(null)
+
       return handler.destroy(ModelStub)(req, res).then(x => {
         expect(res.status.args[0][0]).to.eql(404)
         expect(res.json.notCalled).to.eql(true)
         expect(res.end.calledOnce).to.eql(true)
       })
     })
+
     it('handles errors', () => {
       ModelStub.exec.rejects('some error')
+
       return handler.destroy(ModelStub)(req, res).then(x => {
         expect(res.status.args[0][0]).to.eql(500)
         expect(res.json.notCalled).to.eql(true)
         expect(res.send.calledOnce).to.eql(true)
       })
-    });
+    })
   })
 })
