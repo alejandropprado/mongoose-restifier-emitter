@@ -17,18 +17,18 @@ const respondWithoutResult = (res, statusCode) => () => {
 }
 
 const removeEntity = res => entity => entity
-    ? entity
-      .remove()
-      .then(() => res.status(204).end())
-    : null
+  ? entity
+    .remove()
+    .then(() => res.status(204).end())
+  : null
 
 const handleEntityNotFound = (res) => entity => {
-    if (!entity) {
-      res.status(404).end()
-      return null
-    }
-    return entity
+  if (!entity) {
+    res.status(404).end()
+    return null
   }
+  return entity
+}
 
 const handleError = (res, statusCode) => err => {
   statusCode = statusCode || 500
@@ -38,8 +38,8 @@ const handleError = (res, statusCode) => err => {
 /**
  * Helper function for create
  */
-const getIdsOrId = (objOrArr) =>
-  (Array.isArray(objOrArr)) ? objOrArr.map(x => ({_id: x._id})) : {_id: objOrArr._id}
+const getIdsOrId = objOrArr =>
+  (Array.isArray(objOrArr)) ? objOrArr.map(x => ({ _id: x._id })) : { _id: objOrArr._id }
 
 exports.index = Model => (req, res, next) =>
   ((req.query.count)
@@ -76,6 +76,7 @@ exports.update = Model => (req, res) => {
   if (req.body._id) {
     delete req.body._id
   }
+
   return Model.findByIdAndUpdate(req.params.id, req.body, { new: true }).exec()
     .then(handleEntityNotFound(res))
 
@@ -89,5 +90,12 @@ exports.destroy = Model => (req, res) =>
   Model.findById(req.params.id).exec()
     .then(handleEntityNotFound(res))
     .then(removeEntity(res))
+    .then(events.emitDeleted(Model.modelName, req))
+    .catch(handleError(res))
+
+// Deletes entities from the DB
+exports.destroyBatch = Model => (req, res) =>
+  Model.deleteMany({ _id: { $in: req.body } }).exec()
+    .then(respondWithoutResult(res, 204))
     .then(events.emitDeleted(Model.modelName, req))
     .catch(handleError(res))
