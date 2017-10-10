@@ -50,6 +50,7 @@ exports.index = Model => (req, res, next) =>
     .limit(req.query.limit || 0)
     .select(req.query.select || false)
     .populate(req.query.populate || '')
+    .sort(req.query.sort || {})
     .exec()
     .then(respondWithResult(res, 200))
     .then(events.emitListed(Model.modelName, req))

@@ -19,6 +19,7 @@ describe('#Models request handlers', () => {
       limit: sinon.stub(),
       select: sinon.stub(),
       populate: sinon.stub(),
+      sort: sinon.stub(),
       exec: sinon.stub(),
       deleteMany: sinon.stub(),
     }
@@ -32,6 +33,7 @@ describe('#Models request handlers', () => {
     ModelStub.select.returns(ModelStub)
     ModelStub.populate.returns(ModelStub)
     ModelStub.deleteMany.returns(ModelStub)
+    ModelStub.sort.returns(ModelStub)
   })
 
   describe('index', () => {
