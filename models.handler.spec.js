@@ -20,6 +20,7 @@ describe('#Models request handlers', () => {
       select: sinon.stub(),
       populate: sinon.stub(),
       sort: sinon.stub(),
+      lean: sinon.stub(),
       exec: sinon.stub(),
       deleteMany: sinon.stub(),
     }
@@ -33,6 +34,7 @@ describe('#Models request handlers', () => {
     ModelStub.select.returns(ModelStub)
     ModelStub.populate.returns(ModelStub)
     ModelStub.deleteMany.returns(ModelStub)
+    ModelStub.lean.returns(ModelStub)
     ModelStub.sort.returns(ModelStub)
   })
 
