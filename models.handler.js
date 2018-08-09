@@ -35,13 +35,21 @@ const handleError = (res, statusCode) => err => {
   return res.status(statusCode).send(err)
 }
 
+const omitResponse = omitAttr => data => {
+  if (!omitAttr) return data
+
+  if (Array.isArray(data)) return data.map(x => _.omit(x.toObject(), omitAttr))
+
+  return _.omit(data.toObject(), omitAttr)
+}
+
 /**
  * Helper function for create
  */
 const getIdsOrId = objOrArr =>
   (Array.isArray(objOrArr)) ? objOrArr.map(x => ({ _id: x._id })) : { _id: objOrArr._id }
 
-exports.index = Model => (req, res, next) =>
+exports.index = (Model, omitAttr) => (req, res, next) =>
   ((req.query.count)
     ? Model.count(req.query.count)
     : (req.query.aggregate)
@@ -53,6 +61,7 @@ exports.index = Model => (req, res, next) =>
     .lean(!!req.query.lean)
     .sort(req.query.sort || {})
     .exec()
+    .then(omitResponse(omitAttr))
     .then(respondWithResult(res, 200))
     .then(events.emitListed(Model.modelName, req))
     .catch(handleError(res, 500))
@@ -66,9 +75,10 @@ exports.create = Model => (req, res) =>
     .catch(handleError(res))
 
 // Gets a single entity from the DB
-exports.show = Model => (req, res) =>
+exports.show = (Model, omitAttr) => (req, res) =>
   Model.findById(req.params.id).exec()
     .then(handleEntityNotFound(res))
+    .then(omitResponse(omitAttr))
     .then(respondWithResult(res, 200))
     .then(events.emitDetailed(Model.modelName, req))
     .catch(handleError(res))

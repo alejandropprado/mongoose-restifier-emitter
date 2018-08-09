@@ -1,12 +1,13 @@
 {
   "name": "mongoose-restifier-emitter",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "A library that helps you build a RESTful API and suscribe to events",
   "main": "index.js",
   "scripts": {
-    "tdd": "mocha --reporter spec --watch",
+    "tdd": "./node_modules/.bin/mocha --reporter spec --watch",
     "test": "./node_modules/.bin/istanbul cover --report html _mocha -- -R spec *.spec.js",
-    "coverage": "./node_modules/.bin/istanbul cover --report html _mocha -- -R spec *.spec.js"
+    "coverage": "./node_modules/.bin/istanbul cover --report html _mocha -- -R spec *.spec.js",
+    "prepublish": "yarn test"
   },
   "repository": {
     "type": "git",
@@ -24,12 +25,13 @@
   },
   "homepage": "https://github.com/Yu-Track/mongoose-restifier-emitter#readme",
   "dependencies": {
-    "chai": "^3.5.0",
-    "lodash": "^4.17.4",
-    "sinon": "^1.17.7",
-    "sinon-as-promised": "^4.0.2"
+    "lodash": "^4.17.10"
   },
   "devDependencies": {
-    "istanbul": "^0.4.5"
+    "chai": "^3.5.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^5.2.0",
+    "sinon": "^1.17.7",
+    "sinon-as-promised": "^4.0.3"
   }
 }

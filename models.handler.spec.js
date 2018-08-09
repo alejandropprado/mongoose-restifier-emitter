@@ -3,6 +3,7 @@ const expect = require('chai').expect
 const assert = require('assert')
 const handler = require('./models.handler')
 require('sinon-as-promised')
+
 let req = {}, res = {}, next
 
 describe('#Models request handlers', () => {
@@ -110,6 +111,32 @@ describe('#Models request handlers', () => {
         expect(ModelStub.count.notCalled, 'Count should not be called').to.eql(true)
         expect(ModelStub.aggregate.calledOnce, 'aggregate should be called').to.eql(true)
         expect(ModelStub.aggregate.args[0][0]).to.eql({ "foo": "bar" })
+      })
+    })
+
+    it('omit response array data', () => {
+      const data = { _id: '1', password: '123', email: 'a@a.com', test: 'test' }
+      ModelStub.exec.resolves([{ ...data, toObject: () => data }])
+
+      return handler.index(ModelStub, ['password'])(req, res).then(x => {
+        assert(res.json.calledWith([{ _id: '1', email: 'a@a.com', test: 'test' }]), 'Response.send not called with correct args')
+        assert(ModelStub.limit.calledWith(10), 'limit not called with 10')
+        assert(ModelStub.select.calledWith('desc -_id'), 'limit not called with 10')
+        assert(ModelStub.exec.calledOnce, 'Query not executed')
+        assert(res.status.calledWith(200), 'incorrect status code')
+      })
+    })
+
+    it('omit response object data', () => {
+      const data = { _id: '1', password: '123', email: 'a@a.com', test: 'test' }
+      ModelStub.exec.resolves({ ...data, toObject: () => data })
+
+      return handler.index(ModelStub, ['password'])(req, res).then(x => {
+        assert(res.json.calledWith({ _id: '1', email: 'a@a.com', test: 'test' }), 'Response.send not called with correct args')
+        assert(ModelStub.limit.calledWith(10), 'limit not called with 10')
+        assert(ModelStub.select.calledWith('desc -_id'), 'limit not called with 10')
+        assert(ModelStub.exec.calledOnce, 'Query not executed')
+        assert(res.status.calledWith(200), 'incorrect status code')
       })
     })
   })

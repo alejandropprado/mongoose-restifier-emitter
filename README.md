@@ -21,13 +21,17 @@ const mongoose = require('mongoose')
 const { handler } = require('mongoose-restifier-emitter')
 
 const todosSchema = mongoose.Schema({
+    title: String,
     desc: String,
+    created_at: Date,
 })
 
 const Todos = mongoose.model('Todo', todosSchema)
+const omitSeveralAttributes = ['created_at', 'desc']
+const omitOnlyAttribute = 'created_at'
 
-router.get('/', handler.index(Todos))
-router.get('/:id', handler.show(Todos))
+router.get('/', handler.index(Todos, omitSeveralAttributes || omitOnlyAttribute))
+router.get('/:id', handler.show(Todos, omitSeveralAttributes || omitOnlyAttribute))
 router.post('/', handler.create(Todos))
 router.put('/:id', handler.update(Todos))
 router.delete('/:id', handler.destroy(Todos))
