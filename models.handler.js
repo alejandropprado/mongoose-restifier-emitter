@@ -46,8 +46,12 @@ const omitResponse = omitAttr => data => {
 /**
  * Helper function for create
  */
-const getIdsOrId = objOrArr =>
-  (Array.isArray(objOrArr)) ? objOrArr.map(x => ({ _id: x._id })) : { _id: objOrArr._id }
+const getIdsOrId = objOrArr => ({
+  ids: Array.isArray(objOrArr)
+    ? objOrArr.map(x => ({ _id: x._id }))
+    : { _id: objOrArr._id },
+  data: objOrArr,
+})
 
 exports.index = (Model, omitAttr) => (req, res, next) =>
   ((req.query.count)

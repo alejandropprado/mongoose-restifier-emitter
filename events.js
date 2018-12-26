@@ -1,7 +1,7 @@
 const EventEmitter = require('events')
 
 class events extends EventEmitter {
-  constructor(props){
+  constructor(props) {
     super(props)
   }
 
@@ -18,8 +18,9 @@ class events extends EventEmitter {
   }
 
   emitCreated(modelName, req) {
-    return (id) => {
-      this.emit(`${modelName}:created`, req, id)
+    return ({ ids, data }) => {
+      this.emit(`${modelName}:created`, req, { ids, data })
+      return Promise.resolve(ids)
     }
   }
 
