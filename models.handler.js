@@ -59,6 +59,7 @@ exports.index = (Model, omitAttr) => (req, res, next) =>
     : (req.query.aggregate)
       ? Model.aggregate(req.query.aggregate)
       : Model.find(req.query.q))
+    .skip(req.query.skip || 0)
     .limit(req.query.limit || 0)
     .select(req.query.select || false)
     .populate(req.query.populate || '')

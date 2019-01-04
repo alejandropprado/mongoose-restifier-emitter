@@ -17,6 +17,7 @@ describe('#Models request handlers', () => {
       aggregate: sinon.stub(),
       findById: sinon.stub(),
       create: sinon.stub(),
+      skip: sinon.stub(),
       limit: sinon.stub(),
       select: sinon.stub(),
       populate: sinon.stub(),
@@ -31,6 +32,7 @@ describe('#Models request handlers', () => {
     ModelStub.count.returns(ModelStub)
     ModelStub.aggregate.returns(ModelStub)
     ModelStub.findById.returns(ModelStub)
+    ModelStub.skip.returns(ModelStub)
     ModelStub.limit.returns(ModelStub)
     ModelStub.select.returns(ModelStub)
     ModelStub.populate.returns(ModelStub)
