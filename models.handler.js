@@ -4,8 +4,8 @@ const events = require('./events')
 /**
  * Helper functions to handle response
  */
-const respondWithResult = (res, statusCode) => entity => {
-  res.status(statusCode).json(entity)
+const respondWithResult = (res, statusCode, getAttr) => entity => {
+  res.status(statusCode).json(getAttr ? entity[getAttr] : entity)
 
   return entity
 }
@@ -75,7 +75,7 @@ exports.index = (Model, omitAttr) => (req, res, next) =>
 exports.create = Model => (req, res) =>
   Model.create(req.body)
     .then(getIdsOrId)
-    .then(respondWithResult(res, 201))
+    .then(respondWithResult(res, 201, 'ids'))
     .then(events.emitCreated(Model.modelName, req))
     .catch(handleError(res))
 

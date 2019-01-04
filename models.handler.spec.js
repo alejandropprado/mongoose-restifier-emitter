@@ -166,17 +166,7 @@ describe('#Models request handlers', () => {
       ]))
 
       return handler.create(ModelStub)(req, res).then(x => {
-        expect(Object.keys(res.json.args[0][0])).to.be.eql(['ids', 'data'])
-        expect(res.json.args[0][0]).to.eql({
-          ids: [{ _id: '58824947d8977f43b2e94b37' }, { _id: '58824947d8977f43b2e94b39' }],
-          data: [{
-            name: 'Zildjian',
-            _id: '58824947d8977f43b2e94b37'
-          }, {
-            name: 'Steve Jobs',
-            _id: '58824947d8977f43b2e94b39',
-          }]
-        })
+        expect(res.json.args[0][0]).to.eql([{ _id: '58824947d8977f43b2e94b37' }, { _id: '58824947d8977f43b2e94b39' }])
       })
     })
 
@@ -184,11 +174,7 @@ describe('#Models request handlers', () => {
       ModelStub.create.resolves({ name: 'Zildjian', _id: '58824947d8977f43b2e94b37' })
 
       return handler.create(ModelStub)(req, res).then(x => {
-        expect(res.json.args[0][0]).to.be.an("object")
-        expect(res.json.args[0][0]).to.eql({
-          ids: { _id: '58824947d8977f43b2e94b37' },
-          data: { _id: '58824947d8977f43b2e94b37', name: 'Zildjian' },
-        })
+        expect(res.json.args[0][0]).to.eql({ _id: '58824947d8977f43b2e94b37' })
       })
     })
 
