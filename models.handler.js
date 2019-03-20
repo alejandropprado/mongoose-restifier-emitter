@@ -35,12 +35,15 @@ const handleError = (res, statusCode) => err => {
   return res.status(statusCode).send(err)
 }
 
-const omitResponse = omitAttr => data => {
+const omitResponse = (omitAttr, req) => data => {
   if (!omitAttr) return data
 
-  if (Array.isArray(data)) return data.map(x => _.omit(x.toObject(), omitAttr))
+  if (Array.isArray(data)) return data.map(x => _.omit(
+    (!req.query.lean ? x.toObject() : x),
+    omitAttr,
+  ))
 
-  return _.omit(data.toObject(), omitAttr)
+  return _.omit((!req.query.lean ? x.toObject() : x), omitAttr)
 }
 
 /**
@@ -66,7 +69,7 @@ exports.index = (Model, omitAttr) => (req, res, next) =>
     .lean(!!req.query.lean)
     .sort(req.query.sort || {})
     .exec()
-    .then(omitResponse(omitAttr))
+    .then(omitResponse(omitAttr, req))
     .then(respondWithResult(res, 200))
     .then(events.emitListed(Model.modelName, req))
     .catch(handleError(res, 500))
