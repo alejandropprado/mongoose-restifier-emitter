@@ -43,7 +43,7 @@ const omitResponse = (omitAttr, req) => data => {
     omitAttr,
   ))
 
-  return _.omit((!req.query.lean ? x.toObject() : x), omitAttr)
+  return _.omit((!req.query.lean ? data.toObject() : data), omitAttr)
 }
 
 /**
