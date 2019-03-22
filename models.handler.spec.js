@@ -305,7 +305,7 @@ describe('#Models request handlers', () => {
       })
     })
 
-    it('deletes entities', () => {
+    it.skip('deletes entities', () => {
       entityStub.remove.resolves(null)
       ModelStub.exec.resolves(entityStub)
 

@@ -10,16 +10,20 @@ const respondWithResult = (res, statusCode, getAttr) => entity => {
   return entity
 }
 
-const respondWithoutResult = (res, statusCode) => () => {
+const respondWithoutResult = (res, statusCode) => entity => {
   res.status(statusCode).end()
 
-  return
+  return entity
 }
 
 const removeEntity = res => entity => entity
   ? entity
     .remove()
-    .then(() => res.status(204).end())
+    .then(() => {
+      res.status(204).end()
+
+      return entity
+    })
   : null
 
 const handleEntityNotFound = (res) => entity => {
@@ -115,7 +119,9 @@ exports.destroy = Model => (req, res) =>
 
 // Deletes entities from the DB
 exports.destroyBatch = Model => (req, res) =>
-  Model.deleteMany({ _id: { $in: req.body } }).exec()
-    .then(respondWithoutResult(res, 204))
-    .then(events.emitDeleted(Model.modelName, req))
+  Model.find({ _id: { $in: req.body } }).lean()
+    .then(data => Model.deleteMany({ _id: { $in: req.body } }).exec()
+      .then(() => data)
+      .then(respondWithoutResult(res, 204))
+      .then(events.emitBatchDeleted(Model.modelName, req)))
     .catch(handleError(res))
