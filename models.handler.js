@@ -125,3 +125,21 @@ exports.destroyBatch = Model => (req, res) =>
       .then(respondWithoutResult(res, 204))
       .then(events.emitBatchDeleted(Model.modelName, req)))
     .catch(handleError(res))
+
+exports.softDelete = (Model, booleanAttr) => (req, res) =>
+  Model.findOne({ _id: req.params.id }).lean()
+    .then(data =>
+      Model.updateOne({ _id: req.params.id }, { $set: { [booleanAttr]: false } }).exec()
+        .then(() => data)
+        .then(respondWithoutResult(res, 204))
+        .then(events.emitBatchDeleted(Model.modelName, req)))
+    .catch(handleError(res))
+
+exports.softDeleteBatch = (Model, booleanAttr) => (req, res) =>
+  Model.find({ _id: { $in: req.body } }).lean()
+    .then(data =>
+      Model.updateMany({ _id: { $in: req.body } }, { $set: { [booleanAttr]: false } }).exec()
+        .then(() => data)
+        .then(respondWithoutResult(res, 204))
+        .then(events.emitBatchDeleted(Model.modelName, req)))
+    .catch(handleError(res))
