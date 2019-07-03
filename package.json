@@ -1,6 +1,6 @@
 {
   "name": "mongoose-restifier-emitter",
-  "version": "1.0.24",
+  "version": "1.0.28",
   "description": "A library that helps you build a RESTful API and suscribe to events",
   "main": "index.js",
   "scripts": {

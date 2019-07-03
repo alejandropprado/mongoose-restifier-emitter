@@ -109,6 +109,45 @@ exports.update = Model => (req, res) => {
     .catch(handleError(res))
 }
 
+const attrAdapterOfSoftDelete = objAttr => {
+  try {
+    const newObject = Object.keys(objAttr).reduce((acum, key) => {
+      const value = objAttr[key]
+      const isArray = Array.isArray(value)
+
+      if (!isArray) {
+        return Object.assign({}, acum, { [key]: value })
+      }
+
+      if (value.length === 3) {
+        return Object.assign({}, acum, {
+          [key]: (value[1] !== undefined && value[1] !== null
+            ? (new value[0](value[1])[value[2]]())
+            : (new value[0]())
+          )[value[2]](),
+        })
+      }
+
+      if (value.length === 2) {
+        return Object.assign({}, acum, {
+          [key]: (value[1] !== undefined && value[1] !== null
+            ? new value[0](value[1])
+            : new value[0]()
+          ).valueOf(),
+        })
+      }
+
+      return Object.assign({}, acum, {
+        [key]: (typeof value[0] === 'function' ? value[0]() : value[0]),
+      })
+    }, {})
+
+    return newObject
+  } catch (error) {
+    return new Error(error)
+  }
+}
+
 // Deletes an entity from the DB
 exports.destroy = Model => (req, res) =>
   Model.findById(req.params.id).exec()
@@ -126,20 +165,26 @@ exports.destroyBatch = Model => (req, res) =>
       .then(events.emitBatchDeleted(Model.modelName, req)))
     .catch(handleError(res))
 
-exports.softDelete = (Model, booleanAttr) => (req, res) =>
+exports.softDelete = (Model, attrUpdate) => (req, res) =>
   Model.findOne({ _id: req.params.id }).lean()
-    .then(data =>
-      Model.updateOne({ _id: req.params.id }, { $set: { [booleanAttr]: false } }).exec()
+    .then(data => {
+      const $set = attrAdapterOfSoftDelete(attrUpdate)
+
+      return Model.updateOne({ _id: req.params.id }, { $set }).exec()
         .then(() => data)
         .then(respondWithoutResult(res, 204))
-        .then(events.emitBatchDeleted(Model.modelName, req)))
+        .then(events.emitBatchDeleted(Model.modelName, req))
+    })
     .catch(handleError(res))
 
-exports.softDeleteBatch = (Model, booleanAttr) => (req, res) =>
+exports.softDeleteBatch = (Model, attrUpdate) => (req, res) =>
   Model.find({ _id: { $in: req.body } }).lean()
-    .then(data =>
-      Model.updateMany({ _id: { $in: req.body } }, { $set: { [booleanAttr]: false } }).exec()
+    .then(data => {
+      const $set = attrAdapterOfSoftDelete(attrUpdate)
+
+      return Model.updateMany({ _id: { $in: req.body } }, { $set }).exec()
         .then(() => data)
         .then(respondWithoutResult(res, 204))
-        .then(events.emitBatchDeleted(Model.modelName, req)))
+        .then(events.emitBatchDeleted(Model.modelName, req))
+    })
     .catch(handleError(res))
