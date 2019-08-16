@@ -29,6 +29,12 @@ class events extends EventEmitter {
       this.emit(`${modelName}:updated`, req)
     }
   }
+  
+  emitUpdatedBatch(modelName, req) {
+    return () => {
+      this.emit(`${modelName}:updatedBatch`, req)
+    }
+  }
 
   emitDeleted(modelName, req) {
     return entity => {

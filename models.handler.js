@@ -109,6 +109,19 @@ exports.update = Model => (req, res) => {
     .catch(handleError(res))
 }
 
+exports.updateBatch = Model => (req, res) => {
+  const data = Array.isArray(req.body) ? req.body : [req.body]
+  
+  return Promise.all(data.map(obj => Model
+    .findByIdAndUpdate(obj._id, obj, { new: true })
+    .exec()))
+    .then(_.flattenDeep)
+    .then(handleEntityNotFound(res))
+    .then(respondWithoutResult(res, 204))
+    .then(events.emitUpdatedBatch(Model.modelName, req))
+    .catch(handleError(res))
+}
+
 const attrAdapterOfSoftDelete = objAttr => {
   try {
     const newObject = Object.keys(objAttr).reduce((acum, key) => {
